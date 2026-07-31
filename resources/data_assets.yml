@@ -1,0 +1,53 @@
+resources:
+  # Catalogs are platform infrastructure and intentionally stay outside this
+  # workload bundle. The bundle creates its own environment-isolated schemas.
+  schemas:
+    bronze:
+      name: ${var.bronze_schema}
+      catalog_name: ${var.catalog}
+      comment: Bundle-managed raw MarTech landing and ingestion assets for ${bundle.target}.
+
+    silver:
+      name: ${var.silver_schema}
+      catalog_name: ${var.catalog}
+      comment: Bundle-managed validated, quarantined, and historized MarTech assets for ${bundle.target}.
+
+    gold:
+      name: ${var.gold_schema}
+      catalog_name: ${var.catalog}
+      comment: Bundle-managed privacy-safe MarTech analytical assets for ${bundle.target}.
+
+  volumes:
+    landing:
+      name: ${var.landing_volume}
+      catalog_name: ${resources.schemas.bronze.catalog_name}
+      schema_name: ${resources.schemas.bronze.name}
+      volume_type: MANAGED
+      comment: Synthetic Parquet landing files used by the MarTech promotion demo.
+
+  jobs:
+    seed_landing_data:
+      name: MarTech Seed Synthetic Data
+      description: Generates deterministic, PII-free Parquet inputs inside the target workspace.
+      tasks:
+        - task_key: generate_synthetic_parquet
+          spark_python_task:
+            python_file: ../scripts/generate_landing_data.py
+            source: WORKSPACE
+            parameters:
+              - --output
+              - /Volumes/${resources.volumes.landing.catalog_name}/${resources.volumes.landing.schema_name}/${resources.volumes.landing.name}
+              - --seed
+              - "42"
+              - --clean
+          environment_key: serverless_python
+      environments:
+        - environment_key: serverless_python
+          spec:
+            client: "4"
+            dependencies:
+              - numpy>=2.0.0
+              - polars>=1.30.0
+              - pyarrow>=18.0.0
+      queue:
+        enabled: true

@@ -1,0 +1,65 @@
+resources:
+  pipelines:
+    martech_lakehouse:
+      name: MarTech Lakehouse
+      catalog: ${resources.schemas.bronze.catalog_name}
+      schema: ${resources.schemas.bronze.name}
+      channel: CURRENT
+      photon: true
+      serverless: true
+      continuous: false
+      edition: ADVANCED
+      # Makes the pipeline editor open this folder as the editable project root
+      # instead of showing one external source with "No root folder".
+      root_path: ../pipeline
+      libraries:
+        - glob:
+            include: ../pipeline/**
+      configuration:
+        martech.catalog: ${resources.schemas.bronze.catalog_name}
+        martech.bronze_schema: ${resources.schemas.bronze.name}
+        martech.silver_schema: ${resources.schemas.silver.name}
+        martech.gold_schema: ${resources.schemas.gold.name}
+        martech.landing_path: /Volumes/${resources.volumes.landing.catalog_name}/${resources.volumes.landing.schema_name}/${resources.volumes.landing.name}
+        martech.release_label: ${var.release_label}
+        # Remove the former consolidated quarantine and any older demo outputs
+        # that are no longer declared in the focused root folder.
+        pipelines.dropInactiveTables: "true"
+        spark.sql.shuffle.partitions: auto
+
+  jobs:
+    martech_demo_refresh:
+      name: MarTech Baseline Reset
+      tasks:
+        - task_key: refresh_medallion_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.martech_lakehouse.id}
+            full_refresh: true
+      queue:
+        enabled: true
+
+    martech_incremental_refresh:
+      name: MarTech Incremental CDC Refresh
+      tasks:
+        - task_key: process_new_volume_files
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.martech_lakehouse.id}
+            full_refresh: false
+      queue:
+        enabled: true
+
+    validate_promotion:
+      name: MarTech Validate Promotion
+      tasks:
+        - task_key: verify_promoted_data_product
+          notebook_task:
+            notebook_path: ../notebooks/Validate Promotion.py
+            source: WORKSPACE
+            base_parameters:
+              environment: ${bundle.target}
+              catalog: ${resources.schemas.gold.catalog_name}
+              bronze_schema: ${resources.schemas.bronze.name}
+              silver_schema: ${resources.schemas.silver.name}
+              gold_schema: ${resources.schemas.gold.name}
+      queue:
+        enabled: true

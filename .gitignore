@@ -1,0 +1,18 @@
+.databricks/
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+*.pyc
+
+# Local-only: workshop/Genie demo assets and internal docs stay out of the
+# public CI/CD demo repo.
+genie/
+notebooks/*
+!notebooks/Validate Promotion.py
+docs/*
+!docs/CICD_DEMO_SCRIPT.md
+!docs/CICD_RUNBOOK.md
+scripts/test_workshop_contract.py
+DEMO.md
+TASKS.md

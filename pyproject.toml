@@ -1,0 +1,28 @@
+[project]
+name = "martech-dab-demo"
+version = "0.1.0"
+description = "Synthetic MarTech medallion pipeline with Asset Bundle CI/CD"
+requires-python = ">=3.11"
+dependencies = [
+  "databricks-sdk>=0.74.0",
+  "numpy>=2.0.0",
+  "polars>=1.30.0",
+  "pyarrow>=18.0.0",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0.0",
+  "ruff>=0.11.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["scripts"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint.per-file-ignores]
+"notebooks/*.py" = ["E402", "F821"]
+"pipeline/*.py" = ["F821"]

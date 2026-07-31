@@ -1,0 +1,83 @@
+bundle:
+  # Separate deployment identity protects the already rehearsed workshop demo.
+  name: martech-dab-demo
+  databricks_cli_version: ">= 0.298.0"
+  engine: direct
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Existing environment-specific Unity Catalog
+    default: nethra
+  bronze_schema:
+    description: Raw MarTech landing schema
+    default: martech_bronze
+  silver_schema:
+    description: Validated and historized MarTech schema
+    default: martech_silver
+  gold_schema:
+    description: Business-ready MarTech star schema
+    default: martech_gold
+  landing_volume:
+    description: UC Volume holding synthetic source batches
+    default: landing
+  release_label:
+    description: Human-readable release marker shown in the pipeline configuration
+    default: v1.0.0
+  warehouse_id:
+    description: Serverless SQL warehouse used by Genie and semantic setup
+    default: a9708cef5a5df1d9
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://fe-vm-vdm-serverless-zr8ajc.cloud.databricks.com
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.target}/${bundle.name}
+      # Keep deployment state under .bundle, but place the executable sources
+      # in a presenter-friendly workspace folder visible from the pipeline UI.
+      file_path: /Workspace/Users/${workspace.current_user.userName}/MarTech CI-CD/${bundle.target}/source
+    variables:
+      catalog: nethra
+      bronze_schema: martech_dab_bronze
+      silver_schema: martech_dab_silver
+      gold_schema: martech_dab_gold
+      release_label: v1.0.0
+
+  prod:
+    # Deployed by GitHub Actions after PR review and an approved environment
+    # gate. Local CLI deploys to this target are for break-glass only.
+    mode: production
+    bundle:
+      deployment:
+        fail_on_active_runs: true
+        lock:
+          enabled: true
+    workspace:
+      host: https://fe-sandbox-classic-sandbox-2e9cn2.cloud.databricks.com
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.target}/${bundle.name}
+      file_path: /Workspace/Users/${workspace.current_user.userName}/MarTech CI-CD/${bundle.target}/source
+    variables:
+      catalog: martech_prod
+      bronze_schema: martech_dab_bronze
+      silver_schema: martech_dab_silver
+      gold_schema: martech_dab_gold
+      release_label: v1.0.0
+    resources:
+      schemas:
+        bronze:
+          lifecycle:
+            prevent_destroy: true
+        silver:
+          lifecycle:
+            prevent_destroy: true
+        gold:
+          lifecycle:
+            prevent_destroy: true
+      volumes:
+        landing:
+          lifecycle:
+            prevent_destroy: true

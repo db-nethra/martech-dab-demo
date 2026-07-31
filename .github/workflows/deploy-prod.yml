@@ -1,0 +1,60 @@
+name: Deploy prod
+
+# Merging to main queues a deployment that pauses at the protected `prod`
+# environment until a required reviewer approves it in the Actions UI.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prod-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Gated prod deployment (e2-demo)
+    runs-on: ubuntu-latest
+    environment: prod
+    env:
+      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: databricks/setup-cli@main
+
+      - name: Validate
+        run: databricks bundle validate -t prod
+
+      - name: Plan (recorded before deploy)
+        run: |
+          databricks bundle plan -t prod | tee plan.txt
+          {
+            echo "## Prod deployment plan"
+            echo '```'
+            cat plan.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Deploy
+        run: databricks bundle deploy -t prod
+
+      - name: Seed environment-local synthetic data
+        run: databricks bundle run -t prod seed_landing_data
+
+      - name: Run pipeline (full baseline refresh)
+        run: databricks bundle run -t prod martech_demo_refresh
+
+      - name: Run promotion acceptance gate
+        run: databricks bundle run -t prod validate_promotion
+
+      - name: Retain plan as release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prod-deployment-plan-${{ github.run_number }}
+          path: plan.txt
+          retention-days: 90
