@@ -6,13 +6,17 @@ __pycache__/
 *.pyc
 
 # Local-only: workshop/Genie demo assets and internal docs stay out of the
-# public CI/CD demo repo.
+# public CI/CD demo repo. Ignore by exact name — bundle sync honors ignores
+# but not `!` negations, so wildcard-plus-negation would drop synced files
+# that deployed jobs need (e.g. the validation notebook).
 genie/
-notebooks/*
-!notebooks/Validate Promotion.py
+notebooks/MarTech Lakehouse Workshop.py
+notebooks/MarTech Workshop Answer Key.py
+notebooks/MarTech Live CDC Demo.py
 docs/*
 !docs/CICD_DEMO_SCRIPT.md
 !docs/CICD_RUNBOOK.md
 scripts/test_workshop_contract.py
 DEMO.md
 TASKS.md
+uv.lock
