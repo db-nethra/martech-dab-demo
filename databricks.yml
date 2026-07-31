@@ -45,7 +45,7 @@ targets:
       bronze_schema: martech_dab_bronze
       silver_schema: martech_dab_silver
       gold_schema: martech_dab_gold
-      release_label: v1.0.0
+      release_label: v1.0.1
 
   prod:
     # Deployed by GitHub Actions after PR review and an approved environment
@@ -65,7 +65,7 @@ targets:
       bronze_schema: martech_dab_bronze
       silver_schema: martech_dab_silver
       gold_schema: martech_dab_gold
-      release_label: v1.0.0
+      release_label: v1.0.1
     resources:
       schemas:
         bronze:
