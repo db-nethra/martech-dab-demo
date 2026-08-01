@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Gated prod deployment (e2-demo)
+    name: Gated prod deployment (sandbox)
     runs-on: ubuntu-latest
     environment: prod
     env:
