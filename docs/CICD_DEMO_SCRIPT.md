@@ -188,6 +188,17 @@ candidate, and who owns the release-manager role.
 - **"Where's UAT?"** — Same target shape as prod: add a `uat` target block and
   a workflow environment between dev and prod. Two environments keep this demo
   legible; the pattern is N-environment.
+- **"How does configuration change between dev and prod?"** — It doesn't
+  change at deploy time; it's selected. Each target carries a pre-reviewed
+  variable block in `databricks.yml`; resources reference `${var.*}` and code
+  reads runtime config, so source is environment-blind. A new
+  environment-specific value ships as a variable with dev and prod values in
+  the same PR — the reviewer approves code and both environments'
+  configuration in one diff. Nobody edits settings between environments.
+- **"When do we create the bundle?"** — Never as a separate step: the repo is
+  the bundle. Developers write new pipelines inside an already-deployable
+  project; `bundle deploy` syncs the folder and applies the declared
+  resources.
 - **"How do we roll back?"** — Revert the commit, PR, merge, approve the gated
   deploy. Same audited path in reverse. Data assets are protected from
   deletion throughout.
