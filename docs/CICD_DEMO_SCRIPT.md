@@ -22,9 +22,11 @@ data forward, and no human deploys to production from a laptop.**
    - GitHub repo `db-nethra/martech-dab-demo`
    - Actions tab of the repo (with the last green `Deploy prod` run open as a
      fallback tab)
-   - [Dev pipeline](https://fe-vm-vdm-serverless-zr8ajc.cloud.databricks.com/pipelines/3b8616c5-9d3b-4d16-8ced-6516d057ac69?o=2578201192173249)
-   - Prod pipeline in the sandbox workspace (open from the latest `Deploy
-     prod` run logs or `bundle summary -t prod -p fe-sandbox-prod`)
+   - Dev pipeline in FEVM (open from `bundle summary -t dev -p
+     fe-vm-vdm-serverless-zr8ajc`)
+   - [Prod pipeline](https://fe-sandbox-classic-sandbox-2e9cn2.cloud.databricks.com/pipelines/53b8c4a3-8009-45ea-92cb-a1bbc24eda5a?o=7474656198150370)
+     — note the pipeline's creator is the `martech-dab-deployer` service
+     principal, not a person
 3. Confirm the local gate and dev auth:
 
    ```bash
