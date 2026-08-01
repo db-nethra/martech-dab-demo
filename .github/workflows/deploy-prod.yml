@@ -5,6 +5,9 @@ name: Deploy prod
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**.md"
   workflow_dispatch: {}
 
 permissions:
