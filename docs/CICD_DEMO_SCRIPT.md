@@ -24,7 +24,7 @@ data forward, and no human deploys to production from a laptop.**
      fallback tab)
    - Dev pipeline in FEVM (open from `bundle summary -t dev -p
      fe-vm-vdm-serverless-zr8ajc`)
-   - [Prod pipeline](https://fe-sandbox-classic-sandbox-2e9cn2.cloud.databricks.com/pipelines/53b8c4a3-8009-45ea-92cb-a1bbc24eda5a?o=7474656198150370)
+   - Prod pipeline (URL_PLACEHOLDER — filled after first release into the new workspace)
      — note the pipeline's creator is the `martech-dab-deployer` service
      principal, not a person
 3. Confirm the local gate and dev auth:
