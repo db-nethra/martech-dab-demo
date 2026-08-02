@@ -30,6 +30,10 @@ resources:
   jobs:
     martech_demo_refresh:
       name: MarTech Baseline Reset
+      schedule:
+        quartz_cron_expression: "0 0 2 * * ?"
+        timezone_id: America/New_York
+        pause_status: ${var.refresh_schedule_state}
       tasks:
         - task_key: refresh_medallion_pipeline
           pipeline_task:

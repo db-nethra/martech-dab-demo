@@ -26,6 +26,9 @@ variables:
   release_label:
     description: Human-readable release marker shown in the pipeline configuration
     default: v1.0.0
+  refresh_schedule_state:
+    description: Whether the nightly baseline refresh trigger fires in this environment
+    default: PAUSED
   warehouse_id:
     description: Serverless SQL warehouse used by Genie and semantic setup
     default: a9708cef5a5df1d9
@@ -46,6 +49,7 @@ targets:
       silver_schema: martech_dab_silver
       gold_schema: martech_dab_gold
       release_label: v1.0.1
+      refresh_schedule_state: PAUSED
 
   prod:
     # Deployed by GitHub Actions after PR review and an approved environment
@@ -66,6 +70,7 @@ targets:
       silver_schema: martech_dab_silver
       gold_schema: martech_dab_gold
       release_label: v1.0.1
+      refresh_schedule_state: UNPAUSED
     resources:
       schemas:
         bronze:
