@@ -116,11 +116,27 @@ edit → deploy → run on mock data in seconds. Say:
 
 ## 8:00–15:00 — Promotion: PR → checks → merge → approved release
 
-The live release is a one-line change. On a branch, bump `release_label`
-(e.g. `v1.1.0 → v1.1.1`) in `databricks.yml`, then push and open the PR
-(VS Code Source Control or `gh pr create`).
+Frame the whole section up front. Say:
 
-Walk the PR while checks run (~2 min — narrate, don't wait silently):
+> Watch for two waves with two different triggers. Wave one fires when the
+> pull request opens — it's pure simulation: tests, validation, and a dry-run
+> plan against prod. Nothing deploys. Wave two fires when the merge lands on
+> main — the merge itself is the starting gun for the release. And through
+> all of it, a human only ever does four things: push, open a PR, merge, and
+> approve. Nobody ever runs a deploy-to-prod command.
+
+The live release is a one-line change. On a branch, bump `release_label`
+(e.g. `v1.1.0 → v1.1.1`) in `databricks.yml`. While the file is open, point
+at the two target blocks:
+
+> Prod's configuration isn't somewhere else — it's here, reviewed, versioned,
+> next to dev's. The developer never discovers or types prod values; the
+> target flag selects them.
+
+Push and open the PR (VS Code Source Control or `gh pr create`).
+
+**Wave one** — walk the PR while checks run (~2 min — narrate, don't wait
+silently):
 
 - **Unit tests and lint** run on every PR — same gate the developer runs
   locally with `uv run pytest`.
@@ -132,12 +148,20 @@ Walk the PR while checks run (~2 min — narrate, don't wait silently):
   > reviewable statement of exactly what would change, attached to the pull
   > request a human is approving. That is the audit artifact.
 
-Merge the PR. The `Deploy prod` workflow starts — and pauses. Show the yellow
-**"Waiting for review"** banner. Say:
+A peer approves the PR. Name what that approval means:
 
-> Merging did not deploy. The workflow is stopped at the protected prod
-> environment until a required reviewer — a different role from the author in
-> your setup — explicitly approves this release.
+> This is the first of two approvals, and they answer different questions.
+> The peer review on the pull request answers "is this code correct?" A
+> second, separate approval is still coming — and in your organization those
+> are different people.
+
+**Wave two** — merge the PR. The `Deploy prod` workflow starts — and pauses.
+Show the yellow **"Waiting for review"** banner. Say:
+
+> The merge was the starting gun, but the release stopped at the protected
+> prod environment. This second approval answers a different question — not
+> "is the code correct?" but "should this release now?" A release manager
+> makes that call, not the author.
 
 Click **Review deployments → Approve**. While the release runs (validate →
 plan → deploy → pipeline refresh → acceptance gate), open the prod pipeline
@@ -147,7 +171,8 @@ the `martech-dab-deployer` service principal (not a person), new
 
 > No human credential can do what you just watched. The only identity that can
 > touch this production workspace is a service principal that only an approved
-> workflow run can exercise.
+> workflow run can exercise. Add it up: push, open a PR, merge, approve —
+> that is the complete list of things a person did.
 
 If the run is slow, pivot to the fallback known-good run tabs and keep
 narrating; the workflow logs from the last successful release tell the same

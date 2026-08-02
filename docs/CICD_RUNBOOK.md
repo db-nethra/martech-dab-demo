@@ -5,7 +5,7 @@
 | Target | Workspace | Deployed by | Catalog | Mode |
 |---|---|---|---|---|
 | `dev` | FEVM `2578201192173249` | CLI, profile `fe-vm-vdm-serverless-zr8ajc` | `nethra` | development |
-| `prod` | sandbox `zz68ce` | GitHub Actions, service principal `martech-dab-deployer` | `martech_prod` | production |
+| `prod` | sandbox `h6k0yr` | GitHub Actions, service principal `martech-dab-deployer` | `martech_prod` | production |
 
 Repo: `db-nethra/martech-dab-demo` (public; contains no credentials or
 customer references).
